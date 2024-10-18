@@ -3,6 +3,7 @@
 Tools to visualize GNSS data.
 
 uses:
+
   -- Numpy
   -- Scipy
   -- Matplotlib
