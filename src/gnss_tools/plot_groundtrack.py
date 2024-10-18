@@ -142,7 +142,7 @@ def main():
     sp3 = orbit.getSp3(*sv_id)
     # if requested satellite is not present (ie. the length of the orbit is 0), exit
     if sp3[1] == 0:
-        logging.error(f"Satellite {args.sv_id} not in file.  Exiting.")
+        logging.error(f"Satellite \'{args.sv_id}\' not in file.  Exiting.")
         sys.exit(EXIT_CODE_SV_MISSING)
 
     # time (to use as labels)
@@ -153,7 +153,7 @@ def main():
     geo = list(tools.toolCartGeoGRS80(*ecef.T))
 
     # plot
-    plot_track(f'{args.sv_id}', geo, time_, args.save)
+    plot_track(args.sv_id, geo, time_, args.save)
 
 
 if __name__ == "__main__":
