@@ -25,12 +25,12 @@ LABELS_INTERVAL = 50
 
 def plot_track_pygmt(sv_id, geo, labels, save):
     """Plot the satellite's ground track using `pygmt`."""
-    pygmt.config(GMT_THEME='modern')
-    pygmt.config(FONT_TITLE='9p,Helvetica-Bold,black')
-    pygmt.config(FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,black')
-    pygmt.config(FONT_ANNOT_SECONDARY='5p,Helvetica,black')
-    # pygmt.config(TITLE_FONT='12p,Helvetica-Bold,black')
-    # pygmt.config(GMT_THEME='modern')
+    pygmt.config(
+        GMT_THEME='modern',
+        FONT_TITLE='9p,Helvetica-Bold,black',
+        FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,black',
+        FONT_ANNOT_SECONDARY='5p,Helvetica,black'
+    )
 
     # define the map region
     region = [-180., 180., -90., 90.]
@@ -39,23 +39,29 @@ def plot_track_pygmt(sv_id, geo, labels, save):
     fig = pygmt.Figure()
 
     fig.set_panel(clearance=['w1c', 'e1c', 'n1c', 's1c'])
-    fig.coast(region=region, projection='J17c', # resolution='h',
-              land='darkgray', water='skyblue')
+    fig.coast(
+        region=region,
+        projection='J17c',
+        # resolution='h',
+        land='darkgray', water='skyblue'
+    )
     fig.basemap(frame=['a30f10g30', f'+tGround track of SV {sv_id}'])
 
     # plot SV positions
-    fig.plot(x=np.degrees(geo[0]), y=np.degrees(geo[1]),
-             style='c0.05c', fill='red', pen='black')
+    fig.plot(
+        x=np.degrees(geo[0]), y=np.degrees(geo[1]),
+        style='c0.05c', fill='red', pen='black'
+    )
 
     # decimate lists and plot labels
     labels = [x for i, x in enumerate(labels) if i % LABELS_INTERVAL == 0]
     geo[0] = [x for i, x in enumerate(geo[0]) if i % LABELS_INTERVAL == 0]
     geo[1] = [x for i, x in enumerate(geo[1]) if i % LABELS_INTERVAL == 0]
-    fig.text(x=np.degrees(geo[0]), y=np.degrees(geo[1]),
-             text=labels,
-             font='4p,Helvetica-Narrow,blue', justify='bl',
-            #  fill='black', pen='black'
-             )
+    fig.text(
+        x=np.degrees(geo[0]), y=np.degrees(geo[1]),
+        text=labels,
+        font='4p,Helvetica-Narrow,blue', justify='bl'
+    )
 
     fig.show()
     if save:
@@ -67,10 +73,11 @@ def plot_track_pygmt(sv_id, geo, labels, save):
 
 def plot_track_plotly(sv_id, geo, labels, save):
     """Plot the satellite's ground track using `plotly`."""
-    fig = px.scatter_geo(lat=np.degrees(geo[1]),
-                         lon=np.degrees(geo[0]),
-                         hover_name=labels,
-                         title=f'Ground track of SV {sv_id}')
+    fig = px.scatter_geo(
+        lat=np.degrees(geo[1]), lon=np.degrees(geo[0]),
+        hover_name=labels,
+        title=f'Ground track of SV {sv_id}'
+    )
     fig.show()
 
 
@@ -165,7 +172,7 @@ def main():
     geo = list(tools.toolCartGeoGRS80(*ecef.T))
 
     # plot
-    plot_track(args.sv_id, geo, time_, args.save)
+    plot_track(f'{sv_id[0]}{sv_id[1]:02d}', geo, time_, args.save)
 
 
 if __name__ == '__main__':
