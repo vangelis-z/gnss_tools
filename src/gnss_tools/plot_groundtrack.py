@@ -83,6 +83,9 @@ except ModuleNotFoundError:
     plot_track = plot_track_pygmt
 
 
+# functions for the command line parser
+# *************************************
+
 def validate_sv_id(sv_id):
     """Validate the satellite ID given as command line argument."""
     # 1st character should denote the GNSS system
@@ -119,6 +122,9 @@ def parse_command_line():
 
     return parser.parse_args()
 
+
+# the driving function
+# ********************
 
 def main():
     """The driving function."""
