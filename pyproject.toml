@@ -1,0 +1,26 @@
+[project]
+name = "gnss_tools"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "vangelis-z", email = "vangelis.zacharis@disroot.org"},
+]
+dependencies = [
+    "numpy>=2.1.2",
+    "scipy>=1.14.1",
+    "matplotlib>=3.9.2",
+    "pygmt>=0.13.0",
+    "gnsstoolbox>=1.2.17",
+]
+requires-python = "==3.10.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "jupyterlab>=4.2.5",
+]
