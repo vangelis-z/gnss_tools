@@ -105,20 +105,26 @@ def parse_command_line():
     """Parse and validate the command line arguments."""
     parser = argparse.ArgumentParser(
         description="Read satellite positions from a SP3 file and plot ground tracks.",
-        epilog="The S/W currently uses `pyGMT` for the plotting, but it's `plotly`-ready.")
+        epilog="The S/W currently uses `pyGMT` for the plotting, but it's `plotly`-ready."
+    )
 
-    parser.add_argument('sp3',
-        help='the file to query')
+    parser.add_argument(
+        'sp3',
+        help="the file to query"
+    )
 
     parser.add_argument('--sv_id',
         type=validate_sv_id,
-        help='''the satellite to plot.
+        help="""the satellite to plot.
     Use RINEX v.3 notation eg. G09, R17, E21, etc.
-    If not given, the first satellite in the file will be used (usually G01)''')
+    If not given, the first satellite in the file will be used (usually G01)"""
+    )
 
-    parser.add_argument('-s', '--save',
+    parser.add_argument(
+        '-s', '--save',
         action='store_true',
-        help='save ground plot to a PNG file')
+        help="save groundplot to a PNG file"
+    )
 
     return parser.parse_args()
 
@@ -162,5 +168,5 @@ def main():
     plot_track(args.sv_id, geo, time_, args.save)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
