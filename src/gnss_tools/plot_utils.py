@@ -10,13 +10,8 @@ import numpy as np
 # pygmt is required
 import pygmt
 
-# if matplotlib and/or plotly are present,
+# if plotly is present,
 # we can choose to export alternative functions (look just before EOF)
-try:
-    import matplotlib.pyplot as plt
-except ModuleNotFoundError:
-    pass
-
 try:
     import plotly.express as px
 except ModuleNotFoundError:
@@ -26,6 +21,9 @@ except ModuleNotFoundError:
 # some constants
 LABELS_INTERVAL = 50
 
+
+# ground track
+# ************
 
 def plot_track_pygmt(sv_id, geo, labels, save):
     """Plot the satellite's ground track using `pygmt`."""
@@ -88,6 +86,9 @@ def plot_track_plotly(sv_id, geo, labels, save):
     fig.show()
 
 
+# skyplot
+# *******
+
 def sky_plot_pygmt(sv_id, az_el, labels, save):
     """Plot the satellite's ground track using `pygmt`."""
     pygmt.config(
@@ -134,13 +135,44 @@ def sky_plot_pygmt(sv_id, az_el, labels, save):
         fig.savefig(png_file, transparent=True)
 
 
-def sky_plot_matplotlib(sv_id, az_el, labels, save):
-    """Plot the satellite's ground track using `matplotlib`."""
-    fig = plt.scatter_geo(
-        lat=np.degrees(az_el[1]), lon=np.degrees(az_el[0]),
+def sky_plot_plotly(sv_id, az_el, labels, save):
+    """Plot the satellite's ground track using `plotly`."""
+    fig = px.scatter_polar(
+        # r=np.degrees(.5 * np.pi - az_el[1]), theta=np.degrees(az_el[0]),
+        r=np.degrees(az_el[1]), theta=np.degrees(az_el[0]),
+        range_theta=[0, 360], start_angle=90, direction="clockwise",
+        range_r=[90, 0],
         hover_name=labels,
         title=f'Ground track of SV {sv_id}'
     )
+
+    fig.show()
+
+
+# time series
+# ***********
+
+def plot_ts_pygmt(sv_id, data, labels, save):
+    """Plot 3D time series using `pygmt`."""
+    pygmt.config(
+        GMT_THEME='modern',
+        FONT_TITLE='9p,Helvetica-Bold,black',
+        FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,black',
+        FONT_ANNOT_SECONDARY='5p,Helvetica,black'
+    )
+
+
+def plot_ts_plotly(sv_id, data, labels, save):
+    """Plot 3D time series using `plotly`."""
+    fig = px.scatter_polar(
+        # r=np.degrees(.5 * np.pi - az_el[1]), theta=np.degrees(az_el[0]),
+        r=np.degrees(data[1]), theta=np.degrees(data[0]),
+        range_theta=[0, 360], start_angle=90, direction="clockwise",
+        range_r=[90, 0],
+        hover_name=labels,
+        title=f'Ground track of SV {sv_id}'
+    )
+
     fig.show()
 
 
@@ -150,4 +182,6 @@ def sky_plot_matplotlib(sv_id, az_el, labels, save):
 plot_track = plot_track_pygmt
 # plot_track = plot_track_plotly
 sky_plot = sky_plot_pygmt
-# sky_plot = sky_plot_matplotlib
+# sky_plot = sky_plot_plotly
+plot_ts = plot_ts_pygmt
+plot_ts = plot_ts_plotly

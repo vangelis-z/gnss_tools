@@ -12,8 +12,8 @@ import gpsdatetime as gpst
 import gnsstoolbox.orbits as orb
 import gnsstoolbox.gnsstools as tools
 
-from gnss_tools import cli_utils
-from gnss_tools import plot_utils
+from src.gnss_tools import cli_utils
+from src.gnss_tools import plot_utils
 
 
 # some constants
