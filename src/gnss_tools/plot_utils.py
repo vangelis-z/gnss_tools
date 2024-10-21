@@ -3,6 +3,7 @@
 
 """Plotting functions"""
 
+import dateutil
 import pathlib
 
 import numpy as np
@@ -20,6 +21,7 @@ except ModuleNotFoundError:
 
 # some constants
 LABELS_INTERVAL = 50
+TIME_SERIES_LABELS = ['X', 'Y', 'Z', 'bias']  # labels for time series plots
 
 
 # ground track
@@ -138,12 +140,11 @@ def sky_plot_pygmt(sv_id, az_el, labels, save):
 def sky_plot_plotly(sv_id, az_el, labels, save):
     """Plot the satellite's ground track using `plotly`."""
     fig = px.scatter_polar(
-        # r=np.degrees(.5 * np.pi - az_el[1]), theta=np.degrees(az_el[0]),
         r=np.degrees(az_el[1]), theta=np.degrees(az_el[0]),
         range_theta=[0, 360], start_angle=90, direction="clockwise",
         range_r=[90, 0],
         hover_name=labels,
-        title=f'Ground track of SV {sv_id}'
+        title=f'Skyplot of SV {sv_id}'
     )
 
     fig.show()
@@ -160,6 +161,65 @@ def plot_ts_pygmt(sv_id, data, labels, save):
         FONT_ANNOT_PRIMARY='6p,Helvetica-Bold,black',
         FONT_ANNOT_SECONDARY='5p,Helvetica,black'
     )
+
+    # define the plot region
+    dtimes = [dateutil.parser.isoparse(t) for t in labels]
+
+    fig = pygmt.Figure()
+
+    # create subplots
+    with fig.subplot(
+        nrows=4, ncols=1,
+        figsize=('17c', '14c'),
+        autolabel=False,
+        margins=['0.2c', '0.2c'],
+        title=f'State difference for SV {sv_id}',
+        sharex="b",  # bottom
+        frame=['xafg+lTime', 'yafg']
+    ):
+        # define map parameters
+        for col in range(data.shape[1]):
+            # compute extra spacing
+            # TODO: use pygmt.info to compute this
+            delta = (data[:, col].max() - data[:, col].min()) * .05
+
+            fig.basemap(
+                region=[
+                    dtimes[0], dtimes[-1],
+                    data[:, col].min() - delta, data[:, col].max() + delta
+                ],
+                projection="X?",
+                frame=[f'y+lδ{TIME_SERIES_LABELS[col]}'],
+                panel=[col])
+
+        # plot differences
+        fig.plot(
+            x=labels, y=data[:, 0],
+            style='c0.05c', fill='red', pen='black',
+            panel=[0]
+        )
+        fig.plot(
+            x=labels, y=data[:, 1],
+            style='c0.05c', fill='red', pen='black',
+            panel=[1]
+        )
+        fig.plot(
+            x=labels, y=data[:, 2],
+            style='c0.05c', fill='red', pen='black',
+            panel=[2]
+        )
+        fig.plot(
+            x=labels, y=data[:, 3],
+            style='c0.05c', fill='red', pen='black',
+            panel=[3]
+        )
+
+    fig.show()
+    if save:
+        png_file = pathlib.Path(__file__).parents[2]\
+                                         .joinpath('plots')\
+                                         .joinpath(f'difference_{sv_id}.png')
+        fig.savefig(png_file, transparent=True)
 
 
 def plot_ts_plotly(sv_id, data, labels, save):
@@ -184,4 +244,4 @@ plot_track = plot_track_pygmt
 sky_plot = sky_plot_pygmt
 # sky_plot = sky_plot_plotly
 plot_ts = plot_ts_pygmt
-plot_ts = plot_ts_plotly
+# plot_ts = plot_ts_plotly

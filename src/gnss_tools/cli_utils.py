@@ -23,6 +23,36 @@ def validate_sv_id(sv_id):
     return sv_id
 
 
+def validate_sp3(sp3):
+    """Validate the SP3 filename given as command line argument."""
+    # filename should end in 'sp3' or 'SP3'
+    if not sp3.lower().endswith('sp3'):
+        raise argparse.ArgumentTypeError("SP3 filename error.")
+
+    # check header line
+    with open(sp3, 'r') as fh:
+        line = fh.readline()[:-1].split()
+    if line[7].upper() != 'ORBIT' or line[0][1].lower() not in ['c', 'd']:
+        raise argparse.ArgumentTypeError("Not a valid SP3 filen.")
+
+    return sp3
+
+
+def validate_nav(nav):
+    """Validate the RINEX NAV filename given as command line argument."""
+    # filename should end in 'n.rnx', '.??n', '.??g', '.??l', or their capitalised equivalents
+    if not nav.lower().endswith(('n.rnx', 'n', 'g', 'l')):
+        raise argparse.ArgumentTypeError("RINEX NAV filename error.")
+
+    # check header line
+    with open(nav, 'r') as fh:
+        line = fh.readline()[:-1]
+    if 'NAV' not in line.upper():
+        raise argparse.ArgumentTypeError("Not a valid RINEX NAV file.")
+
+    return nav
+
+
 def validate_observer_position(pos):
     """Validate the observer coordinates given as command line argument."""
     # check for range from geocenter
