@@ -214,5 +214,10 @@ def concatenate_states(states0, states1):
     # concatenate the two arrays horizontally, excluding the epochs column from states1
     result = np.hstack((matched_states0, matched_states1[:, 1:]))
 
-    return result
+    # remove rows with np.nan
+    mask = ~np.isnan(result).any(axis=1)
+    result = result[mask]
 
+    # sort by times
+    indices = result[:, 0].argsort()
+    return result[indices]
