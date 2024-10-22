@@ -21,7 +21,11 @@ except ModuleNotFoundError:
 
 # some constants
 LABELS_INTERVAL = 50
-TIME_SERIES_LABELS = ['X', 'Y', 'Z', 'bias']  # labels for time series plots
+TIME_SERIES_LABELS = {  # labels for time series plots
+    'ecef': ['X', 'Y', 'Z', 'bias'],
+    'local': ['E', 'N', 'U', 'bias'],
+    'body': ['along', 'cross', 'radial', 'bias']
+}
 
 
 # ground track
@@ -153,7 +157,7 @@ def sky_plot_plotly(sv_id, az_el, labels, save):
 # time series
 # ***********
 
-def plot_ts_pygmt(sv_id, data, labels, save):
+def plot_ts_pygmt(sv_id, data, labels, plot_type='local', save=False):
     """Plot 3D time series using `pygmt`."""
     pygmt.config(
         GMT_THEME='modern',
@@ -189,7 +193,7 @@ def plot_ts_pygmt(sv_id, data, labels, save):
                     data[:, col].min() - delta, data[:, col].max() + delta
                 ],
                 projection="X?",
-                frame=[f'y+lδ{TIME_SERIES_LABELS[col]}'],
+                frame=[f'y+lδ{TIME_SERIES_LABELS[plot_type][col]}'],
                 panel=[col])
 
         # plot differences

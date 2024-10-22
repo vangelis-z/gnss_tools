@@ -45,6 +45,15 @@ Interpolate the RINEX NAV ephemeris at times of the SP3 file and plot satellite 
     )
 
     parser.add_argument(
+        '-t', '--type',
+        default='local',
+        choices=['body', 'ecef', 'local'],
+        help="""what to plot.
+    For the time being, only 'ecef' and 'local' plots are supported.
+    Default: '%(default)s'."""
+    )
+
+    parser.add_argument(
         '-s', '--save',
         action='store_true',
         help="save the plot to a PNG file"
@@ -76,25 +85,36 @@ def main():
     nav_states = orbit_tools.get_sv_states(nav, sv_id, mjds)
 
     # concatenate the two state arrays
+    # time, x0, y0, z0, bias0, x1, y1, z1, bias1
     states = orbit_tools.concatenate_states(sp3_states, nav_states)
 
     # create labels for plotting
     labels = [gpst.gpsdatetime(mjd=t).st_iso_epoch() for t in states[:, 0]]
+
+    # compute local coordinates
+    # for each epoch the origin of the local frame is the state from the SP3 file
+    local = np.array([tools.toolCartLocGRS80(*row[1:4], *row[5:-1]) for row in states])
+    # and concatenate with the states
+    # time, x0, y0, z0, bias0, x1, y1, z1, bias1, e, n, u
+    states = np.hstack((states, local))
 
     # compute the differences
     diffs = np.array(
         [[row[1] - row[5], row[2] - row[6], row[3] - row[7], row[4] - row[8]] for row in states]
     )
     # and concatenate with the states
-    data = np.hstack((states, diffs))
-
-    # compute local coordinates
-    # for each epoch the origin of the local frame is the state from the SP3 file
-    # TODO: complete this
-    # local = np.array([tools.toolCartLocGRS80(*row[1:4], *row[9:-1]) for row in data])
+    # time, x0, y0, z0, bias0, x1, y1, z1, bias1, e, n, u, dx, dy, dz, dbias
+    states = np.hstack((states, diffs))
 
     # plot
-    plot_utils.plot_ts(sv_id, data[:, 9:], labels, args.save)
+    if args.type == 'local':
+        plot_utils.plot_ts(
+            sv_id, states[:, np.array([9, 10, 11, 15])],
+            labels, args.type,
+            args.save
+        )
+    elif args.type == 'ecef':
+        plot_utils.plot_ts(sv_id, states[:, 12:], labels, args.type, args.save)
 
 
 if __name__ == '__main__':
